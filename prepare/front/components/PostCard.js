@@ -2,13 +2,16 @@ import React, { useState, useCallback } from "react";
 import { Card, Popover, Button, Avatar, List } from "antd";
 import { RetweetOutlined, HeartOutlined, MessageOutlined, EllipsisOutlined, HeartTwoTone } from "@ant-design/icons";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import PostImages from "./PostImages";
 import CommentForm from "./CommentForm";
 import PostCardContent from "./PostCardContent";
+import { REMOVE_POST_REQUEST } from "../reducers/post";
 
 const PostCard = ({ post }) => {
+  const dispatch = useDispatch();
+  const { removePostLoding } = useSelector((state) => state.post);
   const [liked, setLiked] = useState(false);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
 
@@ -19,6 +22,13 @@ const PostCard = ({ post }) => {
 
   const onToggleComment = useCallback(() => {
     setCommentFormOpened((prev) => !prev);
+  }, []);
+
+  const onRemovePost = useCallback(() => {
+    dispatch({
+      type: REMOVE_POST_REQUEST,
+      data: post.id,
+    });
   }, []);
 
   const { me } = useSelector((state) => state.user);
@@ -34,15 +44,17 @@ const PostCard = ({ post }) => {
           actions={[
             <RetweetOutlined key="retweet" />,
             liked ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onToggleLike} /> : <HeartOutlined key="heart" onClick={onToggleLike} />,
-            <MessageOutlined key="comment" onClick={onToggleComment} />,
+            <MessageOutlined key="message" onClick={onToggleComment} />,
             <Popover
-              key="more"
+              key="ellipsis"
               content={
                 <Button.Group>
                   {id && post.User.id === id ? (
                     <>
                       <Button>수정</Button>
-                      <Button type="danger">삭제</Button>
+                      <Button style={{ background: "red", color: "white" }} loading={removePostLoding} onClick={onRemovePost}>
+                        삭제
+                      </Button>
                     </>
                   ) : (
                     <Button>신고</Button>
