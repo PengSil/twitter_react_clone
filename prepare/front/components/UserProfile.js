@@ -1,7 +1,6 @@
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, Avatar, Button } from "antd";
-import PropTypes from "prop-types";
 import { logoutRequestAction } from "../reducers/user";
 
 const UserProfile = () => {
@@ -40,8 +39,9 @@ const UserProfile = () => {
     </Card>
   );
 };
-UserProfile.propTypes = {
-  // 여기 있는 node는 react 에 있는 node return ( 여기 있는게 모두 node 이다 )
-  setIsLoggedIn: PropTypes.node.isRequired,
-};
+
+// UserProfile.propTypes = {
+//   여기 있는 node는 react 에 있는 node return ( 여기 있는게 모두 node 이다 )
+//   setIsLoggedIn: PropTypes.node.isRequired,
+// };
 export default UserProfile;

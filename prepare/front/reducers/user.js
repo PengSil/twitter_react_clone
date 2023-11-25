@@ -107,6 +107,37 @@ export const loginFailureAction = (data) => {
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case FOLLOW_REQUEST:
+        draft.followLoading = true;
+        draft.followDone = false;
+        draft.followError = null;
+        break;
+      case FOLLOW_SUCCESS:
+        draft.followLoading = false;
+        draft.followDone = true;
+        draft.me.Followings.push({ id: action.data });
+        break;
+      case FOLLOW_FAILURE:
+        draft.followLoading = false;
+        draft.followDone = false;
+        draft.followError = action.error;
+        break;
+      case UNFOLLOW_REQUEST:
+        draft.unfollowLoading = true;
+        draft.unfollowDone = false;
+        draft.unfollowError = null;
+        break;
+      case UNFOLLOW_SUCCESS:
+        draft.unfollowLoading = false;
+        draft.unfollowDone = true;
+        //draft.me = draft.me.Followings.filter((v) => v.id !== action.data);
+        draft.me.Followings = draft.me.Followings.filter((v) => v.id !== action.data);
+        break;
+      case UNFOLLOW_FAILURE:
+        draft.unfollowLoading = false;
+        draft.unfollowDone = false;
+        draft.unfollowError = action.error;
+        break;
       case LOG_IN_REQUEST:
         draft.logInLoading = true;
         draft.logInDone = false;
@@ -136,7 +167,6 @@ const reducer = (state = initialState, action) => {
         draft.logOutLoading = false;
         draft.logOutError = action.error;
         break;
-
       case SIGN_UP_REQUEST:
         draft.signUpLoading = true;
         draft.signUpDone = false;
@@ -150,23 +180,19 @@ const reducer = (state = initialState, action) => {
         draft.signUpLoading = false;
         draft.signUpError = action.error;
         break;
-
       case CHANGE_NICKNAME_REQUEST:
         draft.changeNicknameLoading = true;
         draft.changeNicknameDone = false;
         draft.changeNicknameError = null;
         break;
-
       case CHANGE_NICKNAME_SUCCESS:
         draft.changeNicknameLoading = false;
         draft.changeNicknameDone = true;
         break;
-
       case CHANGE_NICKNAME_FAILURE:
         draft.changeNicknameLoading = false;
         draft.changeNicknameError = action.error;
         break;
-
       case ADD_POST_TO_ME:
         draft.me.Posts.unshift({ id: action.data });
         break;
