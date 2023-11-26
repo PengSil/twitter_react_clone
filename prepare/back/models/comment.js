@@ -9,12 +9,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      // UserId: 1 belongsTo가 있는곳에 이런 컬럼이 생긴다
+      // PostId: 3
     },
     {
       charset: "utf8mb4",
       collate: "utf8mb4_general_ci", // 이모티콘 저장
     }
   );
-  Comment.associate = (db) => {};
+  Comment.associate = (db) => {
+    // 매계변수에 속해있다
+    db.Comment.belongsTo(db.User);
+    db.Comment.belongsTo(db.Post);
+  };
   return Comment;
 };

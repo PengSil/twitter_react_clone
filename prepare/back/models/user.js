@@ -25,6 +25,15 @@ module.exports = (sequelize, DataTypes) => {
       collate: "utf8_general_ci", // 한글 저장
     }
   );
-  User.associate = (db) => {};
+  // 테이블 관계 설정
+  User.associate = (db) => {
+    db.User.hasMany(db.Post);
+    db.User.hasMany(db.Comment);
+    // as 좋아요를 누른 얘들
+    // through 는 테이블 이름을 바꿔주는거고 foreignKey는 컬럼의 id를 바꿔준다
+    db.User.belongsToMany(db.Post, { through: "Like", as: "Liked" });
+    db.User.belongsToMany(db.User, { through: "Follow", as: "Followers", foreignKey: "FollowingId" });
+    db.User.belongsToMany(db.User, { through: "Follow", as: "Followings", foreignKey: "FollowerId" });
+  };
   return User;
 };
