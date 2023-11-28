@@ -1,8 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import Head from "next/head";
 import { Form, Input, Checkbox, Button } from "antd";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
+import Router from "next/router";
 
 import AppLayout from "../components/AppLayout";
 import useinput from "../hooks/useinput";
@@ -14,7 +15,20 @@ const ErrorMessage = styled.div`
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (signUpDone) {
+      Router.push("/");
+    }
+  }, [signUpDone]);
+
+  useEffect(() => {
+    if (signUpError) {
+      alert(signUpError);
+    }
+  }, [signUpError]);
+
   const [email, onChangeEmail] = useinput("");
   const [password, onChangePassword] = useinput("");
   const [nickname, onChangeNickname] = useinput("");
@@ -44,7 +58,7 @@ const Signup = () => {
     if (!term) {
       return setTermError(true);
     }
-    console.log(email, nickname, password);
+    console.log("전송중", email, nickname, password);
     dispatch({
       type: SIGN_UP_REQUEST,
       data: { email, password, nickname },
@@ -70,12 +84,12 @@ const Signup = () => {
         <div>
           <label htmlFor="user-password">비밀번호</label>
           <br />
-          <Input name="user-password" value={password} required onChange={onChangePassword} />
+          <Input name="user-password" type="password" value={password} required onChange={onChangePassword} />
         </div>
         <div>
           <label htmlFor="user-password-check">비밀번호체크</label>
           <br />
-          <Input name="user-password-check" value={passwordCheck} required onChange={onChangePasswordCheck} />
+          <Input name="user-password-check" type="password" value={passwordCheck} required onChange={onChangePasswordCheck} />
           {PasswordError && <ErrorMessage>비밀번호가 일치하지 않습니다</ErrorMessage>}
         </div>
         <div>

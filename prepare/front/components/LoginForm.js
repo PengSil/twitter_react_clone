@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import PropTypes from "prop-types";
+//import PropTypes from "prop-types";
 import { Form, Input, Button } from "antd";
 import Link from "next/link";
 import styled from "styled-components";
@@ -70,8 +70,8 @@ const LoginForm = () => {
   );
 };
 
-LoginForm.propTypes = {
-  // 여기 있는 node는 react 에 있는 node return ( 여기 있는게 모두 node 이다 )
-  setIsLoggedIn: PropTypes.func.isRequired,
-};
+// LoginForm.propTypes = {
+//   // 여기 있는 node는 react 에 있는 node return ( 여기 있는게 모두 node 이다 )
+//   setIsLoggedIn: PropTypes.func.isRequired,
+// };
 export default LoginForm;

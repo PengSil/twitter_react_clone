@@ -1,4 +1,4 @@
-import { all, fork, put, takeLatest, delay } from "redux-saga/effects";
+import { all, fork, put, takeLatest, delay, call } from "redux-saga/effects";
 import axios from "axios";
 import {
   LOG_IN_REQUEST,
@@ -20,21 +20,15 @@ import {
 
 // eslint-disable-next-line
 function logInAPI(data) {
-  return axios.post("/api/login", data);
-}
-// eslint-disable-next-line
-function logOutAPI() {
-  return axios.post("/api/logout");
+  return axios.post("/user/login", data);
 }
 
 function* logIn(action) {
   try {
-    console.log("saga logIn");
-    //const result = yield call(logInAPI, action.data);
-    yield delay(1000);
+    const result = yield call(logInAPI, action.data);
     yield put({
       type: LOG_IN_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({
@@ -44,6 +38,10 @@ function* logIn(action) {
   }
 }
 
+// eslint-disable-next-line
+function logOutAPI() {
+  return axios.post("/user/logOut");
+}
 function* logOut() {
   try {
     // const result = yield call(logOutAPI);
@@ -60,14 +58,14 @@ function* logOut() {
 }
 
 // eslint-disable-next-line
-function signUpAPI() {
-  return axios.post("/api/signUp");
+function signUpAPI(data) {
+  return axios.post("/user", data);
 }
 
-function* signUp() {
+function* signUp(action) {
   try {
-    // const result = yield call(signUpAPI);
-    yield delay(1000);
+    const result = yield call(signUpAPI, action.data);
+    console.log(result);
     //throw new Error("");
     yield put({
       type: SIGN_UP_SUCCESS,
@@ -82,14 +80,14 @@ function* signUp() {
 
 // eslint-disable-next-line
 function followAPI() {
-  return axios.post("/api/follow");
+  return axios.post("/follow");
 }
 
 function* follow(action) {
   try {
     // const result = yield call(signUpAPI);
     yield delay(1000);
-    //throw new Error("");
+    // throw new Error("");
     yield put({
       type: FOLLOW_SUCCESS,
       data: action.data,
@@ -104,7 +102,7 @@ function* follow(action) {
 
 // eslint-disable-next-line
 function unfollowAPI() {
-  return axios.post("/api/unfollow");
+  return axios.post("/unfollow");
 }
 
 function* unfollow(action) {

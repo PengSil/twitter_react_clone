@@ -1,7 +1,10 @@
 import { all, fork, take, call, put, takeEvery, takeLatest, delay } from "redux-saga/effects"; //eslint-disable-line
+import axios from "axios"; // eslint-disable-line
 
 import postSaga from "./post";
 import userSaga from "./user";
+
+axios.defaults.baseURL = "http://localhost:3065";
 
 // fork는 비동기 함수 호출 call은 동기 함수 호출
 /*

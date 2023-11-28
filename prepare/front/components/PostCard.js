@@ -15,6 +15,11 @@ const PostCard = ({ post }) => {
   const { removePostLoding } = useSelector((state) => state.post);
   const [liked, setLiked] = useState(false);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
+  const { me } = useSelector((state) => state.user);
+  // 옵셔널 체이닝 연산자
+  //me && me.id;
+  const id = me?.id;
+  console.log("포스트", post);
 
   const onToggleLike = useCallback(() => {
     console.log("버튼클릭중");
@@ -31,11 +36,6 @@ const PostCard = ({ post }) => {
       data: post.id,
     });
   }, []);
-
-  const { me } = useSelector((state) => state.user);
-  // 옵셔널 체이닝 연산자
-  //me && me.id;
-  const id = me?.id;
 
   return (
     <>
@@ -99,7 +99,7 @@ const PostCard = ({ post }) => {
 
 PostCard.propTypes = {
   post: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.string,
     User: PropTypes.object,
     content: PropTypes.string,
     createdAt: PropTypes.object,
