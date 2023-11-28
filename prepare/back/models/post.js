@@ -17,9 +17,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
   Post.associate = (db) => {
-    // ? : 1 관계
+    // ? : 1 관계  글이 작성자에 속해있다.
     db.Post.belongsTo(db.User);
-    db.Post.belongsToMany(db.Hashtag);
+    db.Post.belongsToMany(db.Hashtag, { through: "PostHashtag" }); // post.
     db.Post.hasMany(db.Comment);
     db.Post.hasMany(db.Image);
     // 위에 있는 db.Post.belongsTo(db.User); 와 구별 할때 as를 사용 as에 따라서 post.getLikers 처럼 게시글 좋아요 누른사람 가져옴 Post에 좋아요를 누른 사람들

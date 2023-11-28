@@ -9,8 +9,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      // UserId: 1 belongsTo가 있는곳에 이런 컬럼이 생긴다
-      // PostId: 3
+      // UserId: 1 belongsTo가 있는곳에 이런 컬럼이 생긴다  소유자
+      // PostId: 3 소유 게시글
     },
     {
       charset: "utf8mb4",
@@ -18,7 +18,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
   Comment.associate = (db) => {
-    // 매계변수에 속해있다
     db.Comment.belongsTo(db.User);
     db.Comment.belongsTo(db.Post);
   };
