@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const { User } = require("../models/");
+const { User, Post } = require("../models/");
 // db.User
 
 const router = express.Router();
@@ -30,7 +30,30 @@ router.post("/login", (req, res, next) => {
       }
       // res.setHeader('Cookie', 'cxlhy');
       // 이부분이 실행되는 순간 cookie와 사용자 정보를 같이 front로 넘겨준다
-      return res.status(200).json(user);
+      const fullUserWithoutPassword = await User.findOne({
+        // 여기서 가져오는건 models에 있는 db.User.hasMany(db.Post); 같은거 에서 가져온다
+        // 근데 hasMany라서 model: Post가 복수형이 되서 me.Posts가 된다
+        // sequelize 가 다른테이블 들의 관계를 합쳐서 보내준다
+        where: { id: user.id },
+        // attributes: ["id", "nickname", "email"],
+        attributes: {
+          exclude: ["password"],
+        },
+        include: [
+          {
+            model: Post,
+          },
+          {
+            model: User,
+            as: "Followings",
+          },
+          {
+            model: User,
+            as: "Followers",
+          },
+        ],
+      });
+      return res.status(200).json(fullUserWithoutPassword);
     });
   })(req, res, next);
 });
@@ -63,10 +86,21 @@ router.post("/", async (req, res, next) => {
 
 // 로그인 한 후부터 passport에 있는 deserializeUser가 router 실행되기 전에 매번 실행되서
 // req.user에 정보가 담겨져 있다
-router.post("/user/logout", (req, res, next) => {
-  req.logout();
-  req.session.destroy();
-  res.send("ok");
+// router.post("/logout", (req, res) => {
+//   req.logout();
+//   req.session.destroy();
+//   res.send("ok");
+// });
+
+router.post("/logout", (req, res, next) => {
+  req.logout((err) => {
+    req.session.destroy();
+    if (err) {
+      res.redirect("/");
+    } else {
+      res.status(200).send("server ok: 로그아웃 완료");
+    }
+  });
 });
 
 module.exports = router;

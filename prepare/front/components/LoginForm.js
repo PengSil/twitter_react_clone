@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 //import PropTypes from "prop-types";
 import { Form, Input, Button } from "antd";
@@ -27,11 +27,18 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const { logInLoading } = useSelector((state) => state.user);
+  const { logInLoading, logInError } = useSelector((state) => state.user);
   const [email, onChangeEmail] = useinput("");
   const [password, onChangePassword] = useinput("");
 
   const style = useMemo(() => ({ marginTop: 10 }), []);
+
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError);
+    }
+  }, [logInError]);
+
   /*hooks 에서 리랜더링이 됬을때 함수 안의 부분이 다시 실행되는건 맞는데
     return부분은 바뀌는 부분만 다시 그린다 전체를 다시 그리는건 아님
   */
