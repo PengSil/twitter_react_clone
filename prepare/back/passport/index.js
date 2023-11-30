@@ -11,6 +11,8 @@ module.exports = () => {
     done(null, user.id);
   });
   // router실행되기 이전에 매번 실행해서 정보값을 가져다줌 req.user
+  // router가 실행되기 전에 deserializeUser가 실행되서 저장해 놨던 id를 토대로 사용자 정보를 복구를 해서
+  // req.user를 만든다
   passport.deserializeUser(async (id, done) => {
     // 복구할때는 serializeUser에 있는 user.id가 여기로 전달되서 이 id로 db에서 데이터 찾아와서 저장
     // 다음 요청부터는 여기서 db에서 id를 통해 사용자를 찾음

@@ -5,7 +5,7 @@ import postSaga from "./post";
 import userSaga from "./user";
 
 axios.defaults.baseURL = "http://localhost:3065";
-
+axios.defaults.withCredentials = true;
 // fork는 비동기 함수 호출 call은 동기 함수 호출
 /*
     call의 방식

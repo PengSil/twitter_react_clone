@@ -1,4 +1,4 @@
-import { all, fork, put, takeLatest, delay } from "redux-saga/effects";
+import { all, fork, put, takeLatest, delay, call } from "redux-saga/effects";
 import axios from "axios";
 import {
   ADD_POST_REQUEST,
@@ -16,6 +16,8 @@ import {
   generateDummyPost,
 } from "../reducers/post";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
+
+//eslint-disable-next-line
 import shortId from "shortid";
 
 //eslint-disable-next-line
@@ -42,26 +44,20 @@ function* loadPosts(action) {
 
 //eslint-disable-next-line
 function addPostAPI(data) {
-  return axios.post("/api/post", data);
+  return axios.post("/post", { content: data });
 }
 
 //eslint-disable-next-line
 function* addPost(action) {
   try {
-    //const result = yield call(addPostAPI, action.data);
-    console.log("이 액션은 머야", action);
-    yield delay(1000);
-    const id = shortId.generate();
+    const result = yield call(addPostAPI, action.data);
     yield put({
       type: ADD_POST_SUCCESS,
-      data: {
-        id,
-        content: action.data,
-      },
+      data: result.data,
     });
     yield put({
       type: ADD_POST_TO_ME,
-      data: id,
+      data: result.data.id,
     });
   } catch (err) {
     yield put({
@@ -100,17 +96,16 @@ function* removePost(action) {
 
 //eslint-disable-next-line
 function addCommentAPI(data) {
-  return axios.post(`/api/post/${data.postId}/comment`, data);
+  return axios.post(`/post/${data.postId}/comment`, data); // POST  /post/1/comment
 }
 
 //eslint-disable-next-line
 function* addComment(action) {
   try {
-    //const result = yield call(addCommentAPI, action.data);
-    yield delay(1000);
+    const result = yield call(addCommentAPI, action.data);
     yield put({
       type: ADD_COMMENT_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({
