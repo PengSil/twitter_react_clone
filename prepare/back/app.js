@@ -26,8 +26,8 @@ passportConfig();
 // json형식의 데이터를 req.body 안에 넣어준다
 app.use(
   cors({
-    origin: "*",
-    //credentials: false,
+    origin: "http://localhost:3060",
+    credentials: true,
   })
 );
 app.use(express.json());
@@ -46,6 +46,7 @@ app.use(
     secret: process.env.COOKIE_SECRET,
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -61,16 +62,11 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.get("/posts", (req, res) => {
-  res.json([
-    { id: 1, content: "hello" },
-    { id: 2, content: "hello2" },
-    { id: 3, content: "hello3" },
-  ]);
-});
-
 app.use("/post", postRouter);
 app.use("/user", userRouter);
+
+// 여기에 마지막에 내부적으로 error처리 미들웨어가 있음 안보임
+// app.use((err, req, res, next) => {}); 따로 에러처리 미들웨어를 사용할수 있음
 
 app.listen(3065, () => {
   console.log("서버 실행 중");

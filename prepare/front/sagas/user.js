@@ -20,7 +20,7 @@ import {
 
 // eslint-disable-next-line
 function logInAPI(data) {
-  return axios.post("/user/login", data);
+  return axios.post("/user/login", data, { withCredentials: true });
 }
 
 function* logIn(action) {
@@ -40,7 +40,7 @@ function* logIn(action) {
 
 // eslint-disable-next-line
 function logOutAPI() {
-  return axios.post("/user/logout");
+  return axios.post("/user/logout", null, { withCredentials: true });
 }
 function* logOut() {
   try {

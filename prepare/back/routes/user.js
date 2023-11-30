@@ -3,14 +3,15 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const { User, Post } = require("../models/");
 // db.User
-
+const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
 const router = express.Router();
 
 // router.post('/login',(req, res, next) => {})
+// (req, res, next) 다 미들웨어임
 
 // POST /user/login
 // 여기서 login 전략 세우기 passport
-router.post("/login", (req, res, next) => {
+router.post("/login", isNotLoggedIn, (req, res, next) => {
   // middleware 확장
   // passport.authenticate는 (req, res, next)를 쓸수 없는데 확장해서 쓸수있게 한다
   passport.authenticate("local", (err, user, info) => {
@@ -53,13 +54,14 @@ router.post("/login", (req, res, next) => {
           },
         ],
       });
+      console.log("로그인 마지막단계", req.session, req.user.id, req.cookies);
       return res.status(200).json(fullUserWithoutPassword);
     });
   })(req, res, next);
 });
 
 //POST /user/
-router.post("/", async (req, res, next) => {
+router.post("/", isNotLoggedIn, async (req, res, next) => {
   try {
     const exUser = await User.findOne({
       where: {
@@ -92,14 +94,20 @@ router.post("/", async (req, res, next) => {
 //   res.send("ok");
 // });
 
-router.post("/logout", (req, res, next) => {
-  req.logout((err) => {
-    req.session.destroy();
-    if (err) {
-      res.redirect("/");
-    } else {
-      res.status(200).send("server ok: 로그아웃 완료");
-    }
+// router.post("/logout", isLoggedIn, (req, res) => {
+//   req.logout((err) => {
+//     if (err) {
+//       res.redirect("/");
+//     } else {
+//       req.session.destroy();
+//       res.status(200).send("server ok: 로그아웃 완료");
+//     }
+//   });
+// });
+
+router.post("/logout", isLoggedIn, (req, res, next) => {
+  req.logout(() => {
+    res.send("ok");
   });
 });
 
