@@ -78,19 +78,16 @@ const PostCard = ({ post }) => {
               itemLayout="horizontal"
               dataSource={post.Comments}
               renderItem={(item) => (
-                console.log("item값", item),
-                (
-                  // 강의에서는 <li></li>로 사용하고 있습니다.
-                  <List.Item>
-                    {/* 강의에서는 <Comment />로 사용하고 있습니다. */}
-                    <List.Item.Meta
-                      // author => title로, content => description으로 적용하면 강의에서 보는 UI와 똑같아요.
-                      title={item.User.nickname}
-                      avatar={<Avatar>{item.User.nickname[0]}</Avatar>}
-                      description={item.content}
-                    />
-                  </List.Item>
-                )
+                // 강의에서는 <li></li>로 사용하고 있습니다.
+                <List.Item>
+                  {/* 강의에서는 <Comment />로 사용하고 있습니다. */}
+                  <List.Item.Meta
+                    // author => title로, content => description으로 적용하면 강의에서 보는 UI와 똑같아요.
+                    title={item.User.nickname}
+                    avatar={<Avatar>{item.User.nickname[0]}</Avatar>}
+                    description={item.content}
+                  />
+                </List.Item>
               )}
             />
           </div>
