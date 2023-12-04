@@ -4,8 +4,10 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const dotenv = require("dotenv");
+const morgan = require("morgan");
 
 const postRouter = require("./routes/post");
+const postsRouter = require("./routes/posts");
 const userRouter = require("./routes/user");
 const db = require("./models");
 const passportConfig = require("./passport");
@@ -21,6 +23,7 @@ db.sequelize
   .catch(console.error);
 
 passportConfig();
+app.use(morgan("dev"));
 
 // front에서 보낸 데이터를 req.body안에 넣어주는 역활(use안에 들어가는것들 미들웨어)
 // json형식의 데이터를 req.body 안에 넣어준다
@@ -65,6 +68,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/post", postRouter);
+app.use("/posts", postsRouter);
 app.use("/user", userRouter);
 
 // 여기에 마지막에 내부적으로 error처리 미들웨어가 있음 안보임
