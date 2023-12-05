@@ -7,13 +7,12 @@ import { useSelector, useDispatch } from "react-redux";
 import PostImages from "./PostImages";
 import CommentForm from "./CommentForm";
 import PostCardContent from "./PostCardContent";
-import { REMOVE_POST_REQUEST } from "../reducers/post";
+import { REMOVE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST } from "../reducers/post";
 import FollowButton from "./FollowButton";
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
   const { removePostLoding } = useSelector((state) => state.post);
-  const [liked, setLiked] = useState(false);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
   const { me } = useSelector((state) => state.user);
   // 옵셔널 체이닝 연산자
@@ -21,9 +20,18 @@ const PostCard = ({ post }) => {
   const id = me?.id;
   console.log("포스트", post);
 
-  const onToggleLike = useCallback(() => {
-    console.log("버튼클릭중");
-    setLiked((prev) => !prev);
+  const onLike = useCallback(() => {
+    dispatch({
+      type: LIKE_POST_REQUEST,
+      data: post.id,
+    });
+  }, []);
+
+  const onUnlike = useCallback(() => {
+    dispatch({
+      type: UNLIKE_POST_REQUEST,
+      data: post.id,
+    });
   }, []);
 
   const onToggleComment = useCallback(() => {
@@ -37,6 +45,7 @@ const PostCard = ({ post }) => {
     });
   }, []);
 
+  const liked = post.Likers.find((v) => v.id === id);
   return (
     <>
       <div style={{ marginBottom: 20 }}>
@@ -44,7 +53,7 @@ const PostCard = ({ post }) => {
           cover={post.Images[0] && <PostImages images={post.Images} />}
           actions={[
             <RetweetOutlined key="retweet" />,
-            liked ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onToggleLike} /> : <HeartOutlined key="heart" onClick={onToggleLike} />,
+            liked ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnlike} /> : <HeartOutlined key="heart" onClick={onLike} />,
             <MessageOutlined key="message" onClick={onToggleComment} />,
             <Popover
               key="ellipsis"
@@ -105,6 +114,7 @@ PostCard.propTypes = {
     createdAt: PropTypes.string,
     Comments: PropTypes.arrayOf(PropTypes.object),
     Images: PropTypes.arrayOf(PropTypes.object),
+    Likers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 
