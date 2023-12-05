@@ -1,4 +1,4 @@
-import { all, fork, put, takeLatest, delay, call } from "redux-saga/effects";
+import { all, fork, put, takeLatest, delay, call } from "redux-saga/effects"; // eslint-disable-line
 import axios from "axios";
 import {
   ADD_POST_REQUEST,
@@ -51,7 +51,7 @@ function* likePost(action) {
 
 //eslint-disable-next-line
 function unlikePostAPI(data) {
-  return axios.patch(`/post/${data}/like`);
+  return axios.delete(`/post/${data}/like`);
 }
 
 //eslint-disable-next-line
@@ -120,18 +120,17 @@ function* addPost(action) {
 
 //eslint-disable-next-line
 function removePostAPI(data) {
-  return axios.delete("/api/post", data);
+  // delete는 데이터를 못넣는다
+  return axios.delete(`/post/${data}`);
 }
 
 //eslint-disable-next-line
 function* removePost(action) {
   try {
-    //const result = yield call(addPostAPI, action.data);
-    console.log("이 액션은 머야", action);
-    yield delay(1000);
+    const result = yield call(removePostAPI, action.data);
     yield put({
       type: REMOVE_POST_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
     yield put({
       type: REMOVE_POST_OF_ME,
