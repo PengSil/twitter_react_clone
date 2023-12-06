@@ -19,12 +19,37 @@ import {
   UNLIKE_POST_REQUEST,
   UNLIKE_POST_SUCCESS,
   UNLIKE_POST_FAILURE,
+  UPLOAD_IMAGES_REQUEST,
+  UPLOAD_IMAGES_SUCCESS,
+  UPLOAD_IMAGES_FAILURE,
   // generateDummyPost,
 } from "../reducers/post";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
-
 //eslint-disable-next-line
 import shortId from "shortid";
+
+//eslint-disable-next-line
+function uploadImagesAPI(data) {
+  // data가 이미 있기 때문에 data를 따로 전달 안해줘도 된다.
+  return axios.post("/post/images", data);
+}
+
+//eslint-disable-next-line
+function* uploadImages(action) {
+  try {
+    const result = yield call(uploadImagesAPI, action.data);
+    // console.log("결과값 ", result);
+    yield put({
+      type: UPLOAD_IMAGES_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: UPLOAD_IMAGES_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
 
 //eslint-disable-next-line
 function likePostAPI(data) {
@@ -165,31 +190,28 @@ function* addComment(action) {
     });
   }
 }
-
+function* watchUploadImages() {
+  yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
+}
 function* watchLikePost() {
   yield takeLatest(LIKE_POST_REQUEST, likePost);
 }
-
 function* watchUnlikePost() {
   yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
 }
-
 function* watchLoadPosts() {
   yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
 }
-
 function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
 }
-
 function* watchRemovePost() {
   yield takeLatest(REMOVE_POST_REQUEST, removePost);
 }
-
 function* watchAddComment() {
   yield takeLatest(ADD_COMMENT_REQUEST, addComment);
 }
 
 export default function* postSaga() {
-  yield all([fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchLoadPosts), fork(watchRemovePost), fork(watchAddComment)]);
+  yield all([fork(watchUploadImages), fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchLoadPosts), fork(watchRemovePost), fork(watchAddComment)]);
 }

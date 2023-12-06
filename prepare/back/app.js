@@ -35,10 +35,10 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json()); // axios로 보낼때 받기
 // router나 app 에 붙는 애들은 다 middleware다 router.post app.use등등
 // form submit했을때 urlencoded방식으로 넘어오는데 그걸 처리함 req.body
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); // form보낸거 받기
 app.use(cookieParser(process.env.COOKIE_SECRET));
 /* 
   cookie의 랜덤 문자열은 데이터를 기반으로 만들어진 문자열이라
