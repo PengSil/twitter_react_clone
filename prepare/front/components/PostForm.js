@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { Form, Input, Button } from "antd";
 import { useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addPost, UPLOAD_IMAGES_REQUEST } from "../reducers/post";
+import { addPost, UPLOAD_IMAGES_REQUEST, REMOVE_IMAGE, ADD_POST_REQUEST } from "../reducers/post";
 import useInput from "../hooks/useinput";
 
 const PostForm = () => {
@@ -18,8 +18,20 @@ const PostForm = () => {
   }, [addPostDone]);
 
   const onSubmit = useCallback(() => {
-    dispatch(addPost(text));
-  }, [text]);
+    if (!text || !text.trim()) {
+      return alert("게시글을 작성하세요");
+    }
+    const formData = new FormData();
+    // backEnd에서 받을때 이미지나 파일 같은게 아니면 body로 넘어간다
+    imagePaths.forEach((p) => {
+      formData.append("image", p);
+    });
+    formData.append("content", text);
+    return dispatch({
+      type: ADD_POST_REQUEST,
+      data: formData,
+    });
+  }, [text, imagePaths]);
 
   const imageInput = useRef();
   const onClickImageUpload = useCallback(() => {
@@ -40,6 +52,13 @@ const PostForm = () => {
     });
   });
 
+  const onRemoveImage = useCallback((index) => () => {
+    dispatch({
+      type: REMOVE_IMAGE,
+      data: index,
+    });
+  });
+
   return (
     <Form style={{ margin: "10px 0 20px" }} encType="multipart/form-data" onFinish={onSubmit}>
       <Input.TextArea value={text} onChange={onChangeText} maxLength={140} placeholder="어떤 신기한 일이 있었나요?" />
@@ -51,14 +70,15 @@ const PostForm = () => {
         </Button>
       </div>
       <div>
-        {imagePaths.map((v) => {
+        {imagePaths.map((v, i) => (
           <div key={v} style={{ display: "inline-block" }}>
-            <img src={v} style={{ width: "200px" }} alt={v} />
+            {/* back에 있는 이미지를 받기 위한 주소설정 cors때매 */}
+            <img src={`http://localhost:3065/${v}`} style={{ width: "200px" }} alt={v} />
             <div>
-              <Button>제거</Button>
+              <Button onClick={onRemoveImage(i)}>제거</Button>
             </div>
-          </div>;
-        })}
+          </div>
+        ))}
       </div>
     </Form>
   );

@@ -30,7 +30,6 @@ import shortId from "shortid";
 
 //eslint-disable-next-line
 function uploadImagesAPI(data) {
-  // data가 이미 있기 때문에 data를 따로 전달 안해줘도 된다.
   return axios.post("/post/images", data);
 }
 
@@ -120,7 +119,8 @@ function* loadPosts(action) {
 
 //eslint-disable-next-line
 function addPostAPI(data) {
-  return axios.post("/post", { content: data });
+  // formData를 넘길때는 바로 데이터로 넘겨줘야 한다 { content: data }이렇게하면 안됨
+  return axios.post("/post", data);
 }
 
 //eslint-disable-next-line

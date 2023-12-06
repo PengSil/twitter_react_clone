@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
+const path = require("path");
 
 const postRouter = require("./routes/post");
 const postsRouter = require("./routes/posts");
@@ -35,6 +36,8 @@ app.use(
     credentials: true,
   })
 );
+// back폴더 안의 uploads를 합쳐준다 앞에 '/' 는 localhost:3065/ /이다
+app.use("/", express.static(path.join(__dirname, "uploads")));
 app.use(express.json()); // axios로 보낼때 받기
 // router나 app 에 붙는 애들은 다 middleware다 router.post app.use등등
 // form submit했을때 urlencoded방식으로 넘어오는데 그걸 처리함 req.body

@@ -3,7 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs"); // 파일 시스템 조작하는 모듈
 
-const { Post, Image, Comment, User } = require("../models");
+const { Post, Image, Comment, User, Hashtag } = require("../models");
 const { isLoggedIn } = require("./middlewares");
 const router = express.Router();
 
@@ -14,14 +14,53 @@ try {
   fs.mkdirSync("uploads");
 }
 
-router.post("/", isLoggedIn, async (req, res, next) => {
+/*multer 이미지 저장 할때 쓰는 라이브러리 app.use로 추가해 줘도 되지만 어떤건 이미지가 안들어가고
+ 어떤건 여러 이미지가 들어가고 설정이 다 달라서 쓰는것만 따로 이런 설정을 해서 쓴다*/ const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, "uploads");
+    },
+    filename(req, file, done) {
+      // 제로초.png
+      // 파일 이름 중복 방지
+      const ext = path.extname(file.originalname); // 확장자 추출(.png)
+      const basename = path.basename(file.originalname, ext); // 제로초
+      done(null, basename + "_" + new Date().getTime() + ext); // 제로초15184712891.png
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB 파일 용량 설정
+});
+// 보통 이미지나 동영상 처리는 서버에서 처리 하면 부담이 많이 가 cpu나 메모리를 많이 잡아먹어서
+// front에서 클라우드로 바로 올리는 방법으로 하는게 좋다
+// upload.single  upload.none  upload.fills
+
+router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   //res.json({ id: 1, content: "hello" });
   try {
+    const hashtags = req.body.content.match(/#[^\s#]+/g);
     const post = await Post.create({
       content: req.body.content,
       // router 접근하기 전에 deserializeUser가 실행되서 저장해 놨던 req.user.id값이 가져와진다
       UserId: req.user.id,
     });
+    if (hashtags) {
+      const result = await Promise.all(hashtags.map((tag) => Hashtag.findOrCreate({ where: { name: tag.slice(1).toLowerCase() } })));
+      // findOrCreate 를 하면 [[노드, true], [리액트, true]] 이런식으로 result 결과값이 나온다
+      // findOrCreate 하는 이유는 #노드, #노드 이런식으로 중복해서 들어오거나
+      // 이미 다른 사람이 해쉬태그를 등록한 경우 같은 해쉬태그를 등록하지 않기 위해 쓴다
+      await post.addHashtags(result.map((v) => v[0]));
+    }
+    if (req.body.image) {
+      // 이미지 여러개 올리면 image: [1.png, 2.jpg]
+      if (Array.isArray(req.body.image)) {
+        const images = await Promise.all(req.body.image.map((image) => Image.create({ src: image })));
+        await post.addImages(images);
+      } else {
+        // 이미지 하나만 올리면 image: 1.png
+        const image = await Image.create({ src: req.body.image });
+        await post.addImages(image);
+      }
+    }
     const fullPost = await Post.findOne({
       where: { id: post.id },
       include: [
@@ -55,27 +94,7 @@ router.post("/", isLoggedIn, async (req, res, next) => {
   }
 });
 
-// multer 이미지 저장 할때 쓰는 라이브러리 app.use로 추가해 줘도 되지만 어떤건 이미지가 안들어가고
-// 어떤건 여러 이미지가 들어가고 설정이 다 달라서 쓰는것만 따로 이런 설정을 해서 쓴다
-const upload = multer({
-  storage: multer.diskStorage({
-    destination(req, file, done) {
-      done(null, "uploads");
-    },
-    filename(req, file, done) {
-      // 제로초.png
-      // 파일 이름 중복 방지
-      const ext = path.extname(file.originalname); // 확장자 추출(.png)
-      const basename = path.basename(file.originalname, ext); // 제로초
-      done(null, basename + new Date().getTime() + ext); // 제로초15184712891.png
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB 파일 용량 설정
-});
-// 보통 이미지나 동영상 처리는 서버에서 처리 하면 부담이 많이 가 cpu나 메모리를 많이 잡아먹어서
-// front에서 클라우드로 바로 올리는 방법으로 하는게 좋다
 // POST /post/images
-// upload.single  upload.none  upload.fills
 router.post("/images", isLoggedIn, upload.array("image"), (req, res, next) => {
   // isLoggedIn 처리 후 upload.array("image")에서 이미지 업로드 후 처리가 되서 async로 동기 처리할 필요가 없다
   console.log(req.files);
