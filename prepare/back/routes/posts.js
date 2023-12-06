@@ -1,4 +1,5 @@
 const express = require("express");
+const { Op } = require("sequelize");
 const router = express.Router();
 
 const { Post, Image, User, Comment } = require("../models");
@@ -6,8 +7,15 @@ const { Post, Image, User, Comment } = require("../models");
 // GET /posts
 router.get("/", async (req, res, next) => {
   try {
+    const where = {};
+    // 초기 로딩이 아닐때
+    if (parseInt(req.query.lastId, 10)) {
+      // 조건이 lastid보다 작은걸로
+      where.id = { [Op.lt]: parseInt(req.query.lastId, 10) };
+    } // 21 20 19 18 17 16 15 14 13 12 11 10
     const posts = await Post.findAll({
       // 10개 가져와라
+      where,
       limit: 10,
       // offset: 0, // 0~10 까지 가져와라 범위설정 게시글 추가 삭제 할때 문제가 있어서 안씀
       order: [

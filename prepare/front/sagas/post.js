@@ -121,14 +121,16 @@ function* unlikePost(action) {
 }
 
 //eslint-disable-next-line
-function loadPostsAPI(data) {
-  return axios.get("/posts", data);
+function loadPostsAPI(lastId) {
+  // get으로는 데이터를 전달할수 없어서 쿼리스트링 방식으로 넣어준다
+  // get은 데이터 캐싱도 가능하다 post put patch는 데이터 캐싱이 안된다
+  return axios.get(`/posts?lastId=${lastId || 0}`);
 }
 
 //eslint-disable-next-line
 function* loadPosts(action) {
   try {
-    const result = yield call(loadPostsAPI, action.data);
+    const result = yield call(loadPostsAPI, action.lastId);
     // console.log("결과값 ", result);
     yield put({
       type: LOAD_POSTS_SUCCESS,
