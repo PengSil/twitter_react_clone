@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import PostImages from "./PostImages";
 import CommentForm from "./CommentForm";
 import PostCardContent from "./PostCardContent";
-import { REMOVE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST } from "../reducers/post";
+import { REMOVE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST } from "../reducers/post";
 import FollowButton from "./FollowButton";
 
 const PostCard = ({ post }) => {
@@ -20,6 +20,16 @@ const PostCard = ({ post }) => {
   const id = me?.id;
   //console.log("포스트", post);
 
+  /*
+  postCard가 리랜더링 되는 만큼 실행되는 버그가 있었음
+  retweetError에다가 retweet게시글 id까지 넣어서 해결할수도 있음
+  지금은 index에다가 써서 1번만 리랜더링 되게 해서 처리함
+  useEffect(() => {
+    if (retweetError) {
+      alert(retweetError);
+    }
+  }, [retweetError]);
+  */
   const onLike = useCallback(() => {
     if (!id) {
       return alert("로그인이 필요합니다.");
@@ -58,7 +68,10 @@ const PostCard = ({ post }) => {
     if (!id) {
       return alert("로그인이 필요합니다.");
     }
-    return dispatch({});
+    return dispatch({
+      type: RETWEET_REQUEST,
+      data: post.id,
+    });
   }, [id]);
 
   const liked = post.Likers.find((v) => v.id === id);
@@ -91,9 +104,16 @@ const PostCard = ({ post }) => {
               <EllipsisOutlined />
             </Popover>,
           ]}
+          title={post.RetweetId ? `${post.User.nickname}님이 리트윗하셨습니다` : null}
           extra={id && <FollowButton post={post} />}
         >
-          <Card.Meta avatar={<Avatar>{post.User.nickname[0]}</Avatar>} title={post.User.nickname} description={<PostCardContent postData={post.content} />} />
+          {post.RetweetId && post.Retweet ? (
+            <Card cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}>
+              <Card.Meta avatar={<Avatar>{post.Retweet.User.nickname[0]}</Avatar>} title={post.Retweet.User.nickname} description={<PostCardContent postData={post.Retweet.content} />} />
+            </Card>
+          ) : (
+            <Card.Meta avatar={<Avatar>{post.User.nickname[0]}</Avatar>} title={post.User.nickname} description={<PostCardContent postData={post.content} />} />
+          )}
         </Card>
         {commentFormOpened && (
           <div>
@@ -131,6 +151,8 @@ PostCard.propTypes = {
     Comments: PropTypes.arrayOf(PropTypes.object),
     Images: PropTypes.arrayOf(PropTypes.object),
     Likers: PropTypes.arrayOf(PropTypes.object),
+    RetweetId: PropTypes.number,
+    Retweet: PropTypes.objectOf(PropTypes.any),
   }).isRequired,
 };
 

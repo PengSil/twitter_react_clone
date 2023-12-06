@@ -133,6 +133,7 @@ router.post("/:postId/comment", isLoggedIn, async (req, res, next) => {
     next(error);
   }
 });
+
 //PATCH /post/1/like
 router.patch("/:postId/like", isLoggedIn, async (req, res, next) => {
   try {
@@ -175,6 +176,92 @@ router.delete("/:postId", isLoggedIn, async (req, res, next) => {
       },
     });
     res.status(200).json({ PostId: parseInt(req.params.postId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+// POST  /post/1/comment  :postId 동적으로 받는 파라미터 req.params로 받을수 있음
+router.post("/:postId/retweet", isLoggedIn, async (req, res, next) => {
+  //res.json({ id: 1, content: "hello" });
+  try {
+    // 존재하지 않는 게시글에 댓글작성 막기
+    // 여기에 delete같은거 날아오면 일이 날수 있기에 막아둠
+    const post = await Post.findOne({
+      where: { id: req.params.postId },
+      include: [
+        {
+          model: Post,
+          as: "Retweet",
+        },
+      ],
+    });
+    if (!post) {
+      return res.status(403).send("존재하지 않는 게시글 입니다.");
+    }
+    // 자기게시글과 남이 자기게시글 리트윗 한거를 리트윗하는걸 막는 코드
+    if (req.user.id === post.UserId || (post.Retweet && post.Retweet.UserId === req.user.id)) {
+      return res.status(403).send("자신의 글은 리트윗 할 수 없습니다.");
+    }
+    // 남의 게시글을 남이 리트윗 한거를 자기가 다시 리트윗 할 수 있다는 코드
+    const retweetTargetId = post.RetweetId || post.id;
+    // 이미 리트윗한걸 찾는 코드
+    const exPost = await Post.findOne({
+      where: {
+        UserId: req.user.id,
+        RetweetId: retweetTargetId,
+      },
+    });
+    if (exPost) {
+      return res.status(403).send("이미 리트윗했습니다.");
+    }
+    // 이렇게 하면 내가 어떤 게시글을 리트윗 했는지가 안나온다
+    const retweet = await Post.create({
+      UserId: req.user.id,
+      RetweetId: retweetTargetId,
+      content: "retweet",
+    });
+    const retweetWithPrevPost = await Post.findOne({
+      where: { id: retweet.id },
+      include: [
+        {
+          model: Post,
+          as: "Retweet",
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: ["id", "nickname"],
+        },
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: "Likers",
+          attributes: ["id"],
+        },
+      ],
+    });
+    res.status(201).json(retweetWithPrevPost);
   } catch (error) {
     console.error(error);
     next(error);

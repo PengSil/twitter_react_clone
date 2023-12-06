@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     db.Post.hasMany(db.Image); // post.addImages, post.getImages
     // 위에 있는 db.Post.belongsTo(db.User); 와 구별 할때 as를 사용 as에 따라서 post.getLikers 처럼 게시글 좋아요 누른사람 가져옴 Post에 좋아요를 누른 사람들
     db.Post.belongsToMany(db.User, { through: "Like", as: "Likers" }); // post.addLikers, post.removeLikers
-    db.Post.belongsTo(db.Post, { as: "RetweetId" }); // post.addRetweet
+    db.Post.belongsTo(db.Post, { as: "Retweet" }); // post.addRetweet
   };
   return Post;
 };
