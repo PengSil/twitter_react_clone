@@ -32,6 +32,7 @@ app.use(
   cors({
     // credentials true로 하고 withCredentials를 하면 민감한 데이터 cookie 같은걸 다루게 되서 보안에 민감하게 된다
     // 그래서 origin: '*' 로 하면 오류남 정확한 주소를 적어줘야함
+    // credentials:true 를 하면 브라우저나 프론트서버에서 보낸 쿠키를 서버에서 처리할수 있게함
     origin: "http://localhost:3060",
     credentials: true,
   })
