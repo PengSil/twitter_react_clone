@@ -11,7 +11,7 @@ const router = express.Router();
 
 //GET /user
 router.get("/", async (req, res, next) => {
-  console.log(req.headers);
+  //console.log(req.headers);
   try {
     if (req.user) {
       // const user = await User.findOne({
@@ -49,6 +49,57 @@ router.get("/", async (req, res, next) => {
       return res.status(200).json(fullUserWithoutPassword);
     } else {
       res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+//GET /user/1
+router.get("/:userId", async (req, res, next) => {
+  try {
+    // const user = await User.findOne({
+    //   where: { id: req.user.id },
+    // });
+    // res.status(200).json(user);
+    const fullUserWithoutPassword = await User.findOne({
+      // 여기서 가져오는건 models에 있는 db.User.hasMany(db.Post); 같은거 에서 가져온다
+      // 근데 hasMany라서 model: Post가 복수형이 되서 me.Posts가 된다
+      // sequelize 가 다른테이블 들의 관계를 합쳐서 보내준다
+      where: { id: req.params.userId },
+      // attributes: ["id", "nickname", "email"], attributes를 쓰면 특정 데이터를 가져오거나 제외하거나 할수있다
+      attributes: {
+        exclude: ["password"],
+      },
+      include: [
+        {
+          // post의 length만 필요 하고 나머지 데이터는 공간만 차지하니 id값만 가져와서 데이터 효율을 늘린다
+          // 서버로 부터 프론트에 필요한 데이터만 보내주기
+          model: Post,
+          attributes: ["id"],
+        },
+        {
+          model: User,
+          as: "Followings",
+          attributes: ["id"],
+        },
+        {
+          model: User,
+          as: "Followers",
+          attributes: ["id"],
+        },
+      ],
+    });
+    if (fullUserWithoutPassword) {
+      const data = fullUserWithoutPassword.toJSON();
+      console.log(data.Followers.length);
+      data.Posts = data.Posts.length; // 개인정보 침해 예방
+      data.Followers = data.Followers.length;
+      data.Followings = data.Followings.length;
+      res.status(200).json(data);
+    } else {
+      res.status(404).json("존재하지 않는 사용자 입니다.");
     }
   } catch (error) {
     console.error(error);

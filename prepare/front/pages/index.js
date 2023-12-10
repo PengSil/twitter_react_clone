@@ -60,6 +60,7 @@ const Home = () => {
 // 쿠키를 보낼때 브라우저에서 백엔드 서버로 보내서 처리 했었는데
 // SSR을 사용함으로써 프론트에서 백엔드 서버로 보내서 cors가 발생함
 // 밑에 코드는 front서버에서 보내는거임
+// getServerSideProps를 하면 방문한 그때 serverside randering이됨 그때그때함
 export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
   // 서버쪽에서 실행하면 context.req라는게 존재한다
   const cookie = context.req ? context.req.headers.cookie : "";
@@ -74,6 +75,7 @@ export const getServerSideProps = wrapper.getServerSideProps((store) => async (c
   store.dispatch({
     type: LOAD_POSTS_REQUEST,
   });
+  // request가 success가 될때까지 기다리는 코드
   store.dispatch(END);
   await store.sagaTask.toPromise();
 });

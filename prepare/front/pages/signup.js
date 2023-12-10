@@ -1,13 +1,16 @@
 import React, { useCallback, useState, useEffect } from "react";
+import axios from "axios";
 import Head from "next/head";
 import { Form, Input, Checkbox, Button } from "antd";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import Router from "next/router";
+import { END } from "redux-saga";
 
+import wrapper from "../store/configureStore";
 import AppLayout from "../components/AppLayout";
 import useinput from "../hooks/useinput";
-import { SIGN_UP_REQUEST } from "../reducers/user";
+import { SIGN_UP_REQUEST, LOAD_MY_INFO_REQUEST } from "../reducers/user";
 
 const ErrorMessage = styled.div`
   color: red;
@@ -114,5 +117,21 @@ const Signup = () => {
     </AppLayout>
   );
 };
+
+export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
+  // 서버쪽에서 실행하면 context.req라는게 존재한다
+  const cookie = context.req ? context.req.headers.cookie : "";
+  axios.defaults.headers.Cookie = "";
+  // 서버일때랑 쿠키가 있을때 이렇게 안하면 쿠키가 공유되는일이 생긴다 서버에서 실행하는거라
+  if (context.req && cookie) {
+    axios.defaults.headers.Cookie = cookie;
+  }
+  store.dispatch({
+    type: LOAD_MY_INFO_REQUEST,
+  });
+  // request가 success가 될때까지 기다리는 코드
+  store.dispatch(END);
+  await store.sagaTask.toPromise();
+});
 
 export default Signup;

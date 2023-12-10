@@ -32,6 +32,9 @@ import {
   REMOVE_FOLLOWER_REQUEST,
   REMOVE_FOLLOWER_SUCCESS,
   REMOVE_FOLLOWER_FAILURE,
+  LOAD_USER_REQUEST,
+  LOAD_USER_SUCCESS,
+  LOAD_USER_FAILURE,
 } from "../reducers/user";
 
 // eslint-disable-next-line
@@ -102,6 +105,7 @@ function changeNicknameAPI(data) {
 function* changeNickname(action) {
   try {
     const result = yield call(changeNicknameAPI, action.data);
+    console.log("result값이 궁금하다", result);
     yield put({
       type: CHANGE_NICKNAME_SUCCESS,
       data: result.data,
@@ -168,6 +172,27 @@ function* loadMyInfo(action) {
   } catch (err) {
     yield put({
       type: LOAD_MY_INFO_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+// eslint-disable-next-line
+function loadUserAPI(data) {
+  return axios.get(`/user/${data}`);
+}
+
+function* loadUser(action) {
+  try {
+    const result = yield call(loadUserAPI, action.data);
+    //throw new Error("");
+    yield put({
+      type: LOAD_USER_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: LOAD_USER_FAILURE,
       error: err.response.data,
     });
   }
@@ -266,6 +291,9 @@ function* watchLogOut() {
 function* watchSignUp() {
   yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
+function* watchLoadUser() {
+  yield takeLatest(LOAD_USER_REQUEST, loadUser);
+}
 
 export default function* userSaga() {
   yield all([
@@ -279,5 +307,6 @@ export default function* userSaga() {
     fork(watchLogIn),
     fork(watchLogOut),
     fork(watchSignUp),
+    fork(watchLoadUser),
   ]);
 }
