@@ -13,6 +13,9 @@ import {
   LOAD_POSTS_REQUEST,
   LOAD_POSTS_SUCCESS,
   LOAD_POSTS_FAILURE,
+  LOAD_POST_REQUEST,
+  LOAD_POST_SUCCESS,
+  LOAD_POST_FAILURE,
   LIKE_POST_REQUEST,
   LIKE_POST_SUCCESS,
   LIKE_POST_FAILURE,
@@ -145,6 +148,30 @@ function* loadPosts(action) {
 }
 
 //eslint-disable-next-line
+function loadPostAPI(data) {
+  // get으로는 데이터를 전달할수 없어서 쿼리스트링 방식으로 넣어준다
+  // get은 데이터 캐싱도 가능하다 post put patch는 데이터 캐싱이 안된다
+  return axios.get(`/post/${data}`);
+}
+
+//eslint-disable-next-line
+function* loadPost(action) {
+  try {
+    const result = yield call(loadPostAPI, action.data);
+    console.log("결과값 ", result);
+    yield put({
+      type: LOAD_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: LOAD_POST_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+//eslint-disable-next-line
 function addPostAPI(data) {
   // formData를 넘길때는 바로 데이터로 넘겨줘야 한다 { content: data }이렇게하면 안됨
   return axios.post("/post", data);
@@ -217,6 +244,9 @@ function* addComment(action) {
     });
   }
 }
+function* watchLoadPost() {
+  yield takeLatest(LOAD_POST_REQUEST, loadPost);
+}
 function* watchRetweet() {
   yield takeLatest(RETWEET_REQUEST, retweet);
 }
@@ -243,5 +273,15 @@ function* watchAddComment() {
 }
 
 export default function* postSaga() {
-  yield all([fork(watchRetweet), fork(watchUploadImages), fork(watchLikePost), fork(watchUnlikePost), fork(watchAddPost), fork(watchLoadPosts), fork(watchRemovePost), fork(watchAddComment)]);
+  yield all([
+    fork(watchLoadPost),
+    fork(watchRetweet),
+    fork(watchUploadImages),
+    fork(watchLikePost),
+    fork(watchUnlikePost),
+    fork(watchAddPost),
+    fork(watchLoadPosts),
+    fork(watchRemovePost),
+    fork(watchAddComment),
+  ]);
 }

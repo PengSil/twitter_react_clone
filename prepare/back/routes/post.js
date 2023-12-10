@@ -166,6 +166,65 @@ router.delete("/:postId/like", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// GET /post/1/
+router.get("/:postId", async (req, res, next) => {
+  //res.json({ id: 1, content: "hello" });
+  try {
+    // 존재하지 않는 게시글에 댓글작성 막기
+    // 여기에 delete같은거 날아오면 일이 날수 있기에 막아둠
+    const post = await Post.findOne({
+      where: { id: req.params.postId },
+    });
+    if (!post) {
+      return res.status(404).send("존재하지 않는 게시글 입니다.");
+    }
+    const fullPost = await Post.findOne({
+      where: { id: post.id },
+      include: [
+        {
+          model: Post,
+          as: "Retweet",
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: ["id", "nickname"],
+        },
+        {
+          model: User,
+          as: "Likers",
+          attributes: ["id"],
+        },
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+          ],
+        },
+      ],
+    });
+    console.log("잘보내는중");
+    res.status(200).json(fullPost);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 // DELETE /post/1
 router.delete("/:postId", isLoggedIn, async (req, res, next) => {
   try {
