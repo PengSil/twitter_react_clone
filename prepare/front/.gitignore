@@ -3,7 +3,7 @@
 /.pnp
 .pnp.js
 /uploads
-./next
+.next
 
 # testing
 /coverage
