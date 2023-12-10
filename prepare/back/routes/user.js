@@ -57,7 +57,7 @@ router.get("/", async (req, res, next) => {
 });
 
 //GET /user/1
-router.get("/:userId", async (req, res, next) => {
+router.get("/loadUser/:userId", async (req, res, next) => {
   try {
     // const user = await User.findOne({
     //   where: { id: req.user.id },
@@ -99,7 +99,7 @@ router.get("/:userId", async (req, res, next) => {
       data.Followings = data.Followings.length;
       res.status(200).json(data);
     } else {
-      res.status(404).json("존재하지 않는 사용자 입니다.");
+      res.status(404).json("여기가 왜 실행됨???");
     }
   } catch (error) {
     console.error(error);

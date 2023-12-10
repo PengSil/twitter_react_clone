@@ -78,13 +78,13 @@ function* loadFollowers(action) {
 }
 
 // eslint-disable-next-line
-function loadFollwingsAPI(data) {
+function loadFollowingsAPI(data) {
   return axios.get("/user/followings", data);
 }
 
-function* loadFollwings(action) {
+function* loadFollowings(action) {
   try {
-    const result = yield call(loadFollwingsAPI, action.data);
+    const result = yield call(loadFollowingsAPI, action.data);
     yield put({
       type: LOAD_FOLLOWINGS_SUCCESS,
       data: result.data,
@@ -179,7 +179,7 @@ function* loadMyInfo(action) {
 
 // eslint-disable-next-line
 function loadUserAPI(data) {
-  return axios.get(`/user/${data}`);
+  return axios.get(`/user/loadUser/${data}`);
 }
 
 function* loadUser(action) {
@@ -261,14 +261,14 @@ function* unfollow(action) {
   }
 }
 
-function* watchremoveFollower() {
+function* watchRemoveFollower() {
   yield takeLatest(REMOVE_FOLLOWER_REQUEST, removeFollower);
 }
 function* watchLoadFollowers() {
   yield takeLatest(LOAD_FOLLOWERS_REQUEST, loadFollowers);
 }
 function* watchLoadFollowings() {
-  yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollwings);
+  yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollowings);
 }
 function* watchChangeNickname() {
   yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
@@ -297,7 +297,7 @@ function* watchLoadUser() {
 
 export default function* userSaga() {
   yield all([
-    fork(watchremoveFollower),
+    fork(watchRemoveFollower),
     fork(watchLoadFollowers),
     fork(watchLoadFollowings),
     fork(watchChangeNickname),

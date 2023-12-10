@@ -45,6 +45,7 @@ const About = () => {
 
 /* 언제 접속해도 데이터가 바뀔일 없으면 getStaticProps를 쓰고 화면이 바껴야하면 getSerSideProps를 사용해야한다
 빌드 할때 미리 server side rendering을 해서 html로 만들어서 나중에 페이지에 접속하면 그때 html을 전달함 */
+
 export const getStaticProps = wrapper.getStaticProps((store) => async () => {
   console.log("getStaticProps");
   store.dispatch({

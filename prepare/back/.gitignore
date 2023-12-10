@@ -4,6 +4,7 @@
 .pnp.js
 /config
 /uploads
+.next
 
 # testing
 /coverage
