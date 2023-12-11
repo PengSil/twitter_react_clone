@@ -17,6 +17,10 @@ const Post = () => {
   const { id } = router.query;
   const { singlePost } = useSelector((state) => state.post);
 
+  // if (router.isFallback) {
+  //   return <div>로딩중...</div>;
+  // }
+
   return (
     <AppLayout>
       {/* 얘네는 알아서 serversiderendering이 된다 이게 되는지 확인하고 싶으면 PostMan에 넣어보기 */}
@@ -35,6 +39,18 @@ const Post = () => {
     </AppLayout>
   );
 };
+
+// getStaticPaths는 getStaticProps 이고 다이나믹 라우팅일때 사용이 가능하다
+// 다이나믹 라우팅이라 id가 여러가지로 바뀔수 있는데 getStaticProps는 미리 페이지를 빌드해서 html로 만든다
+// 근데 다이나믹 라우팅에선 어떤걸 만들어야 할지 몰라서 getStaticPaths로 미리 빌드할 페이지를 정한다
+// export async function getStaticPaths() {
+//   //const result = await axios.get("/post/list");
+//   return {
+//     // 45번 게시글이 미리 빌드업 된다
+//     paths: [{ params: { id: "45" } }, { params: { id: "46" } }],
+//     fallback: true,
+//   };
+// }
 
 export const getServerSideProps = wrapper.getServerSideProps((store) => async (context) => {
   const cookie = context.req ? context.req.headers.cookie : "";
