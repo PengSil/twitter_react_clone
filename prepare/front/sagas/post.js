@@ -28,6 +28,12 @@ import {
   RETWEET_REQUEST,
   RETWEET_SUCCESS,
   RETWEET_FAILURE,
+  LOAD_USER_POSTS_REQUEST,
+  LOAD_USER_POSTS_SUCCESS,
+  LOAD_USER_POSTS_FAILURE,
+  LOAD_HASHTAG_POSTS_REQUEST,
+  LOAD_HASHTAG_POSTS_SUCCESS,
+  LOAD_HASHTAG_POSTS_FAILURE,
   // generateDummyPost,
 } from "../reducers/post";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
@@ -49,6 +55,7 @@ function* retweet(action) {
       data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: RETWEET_FAILURE,
       error: err.response.data,
@@ -71,6 +78,7 @@ function* uploadImages(action) {
       data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: UPLOAD_IMAGES_FAILURE,
       error: err.response.data,
@@ -94,6 +102,7 @@ function* likePost(action) {
       data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: LIKE_POST_FAILURE,
       error: err.response.data,
@@ -116,6 +125,7 @@ function* unlikePost(action) {
       data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: UNLIKE_POST_FAILURE,
       error: err.response.data,
@@ -140,8 +150,61 @@ function* loadPosts(action) {
       data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: LOAD_POSTS_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+//eslint-disable-next-line
+function loadHashtagPostsAPI(data, lastId) {
+  // get으로는 데이터를 전달할수 없어서 쿼리스트링 방식으로 넣어준다
+  // get은 데이터 캐싱도 가능하다 post put patch는 데이터 캐싱이 안된다
+  // get으로 날릴때 한글넣으면 에러나서 encodeURIComponent를 써준다
+  // encodeURIComponent를 쓰면 다른 문자로 변형되는데 decodeURIComponent를 쓰면 다시 돌릴수있다
+  return axios.get(`/hashtag/${encodeURIComponent(data)}?lastId=${lastId || 0}`);
+}
+
+//eslint-disable-next-line
+function* loadHashtagPosts(action) {
+  try {
+    const result = yield call(loadHashtagPostsAPI, action.data, action.lastId);
+    // console.log("결과값 ", result);
+    yield put({
+      type: LOAD_HASHTAG_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_HASHTAG_POSTS_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+//eslint-disable-next-line
+function loadUserPostsAPI(data, lastId) {
+  // get으로는 데이터를 전달할수 없어서 쿼리스트링 방식으로 넣어준다
+  // get은 데이터 캐싱도 가능하다 post put patch는 데이터 캐싱이 안된다
+  return axios.get(`/user/${data}/posts/?lastId=${lastId || 0}`);
+}
+
+//eslint-disable-next-line
+function* loadUserPosts(action) {
+  try {
+    const result = yield call(loadUserPostsAPI, action.data, action.lastId);
+    // console.log("결과값 ", result);
+    yield put({
+      type: LOAD_USER_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_USER_POSTS_FAILURE,
       error: err.response.data,
     });
   }
@@ -164,6 +227,7 @@ function* loadPost(action) {
       data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: LOAD_POST_FAILURE,
       error: err.response.data,
@@ -190,6 +254,7 @@ function* addPost(action) {
       data: result.data.id,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: ADD_POST_FAILURE,
       error: err.response.data,
@@ -216,6 +281,7 @@ function* removePost(action) {
       data: action.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: REMOVE_POST_FAILURE,
       error: err.response.data,
@@ -262,6 +328,12 @@ function* watchUnlikePost() {
 function* watchLoadPosts() {
   yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
 }
+function* watchLoadUserPosts() {
+  yield takeLatest(LOAD_USER_POSTS_REQUEST, loadUserPosts);
+}
+function* watchLoadHashtagPosts() {
+  yield takeLatest(LOAD_HASHTAG_POSTS_REQUEST, loadHashtagPosts);
+}
 function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
 }
@@ -275,6 +347,8 @@ function* watchAddComment() {
 export default function* postSaga() {
   yield all([
     fork(watchLoadPost),
+    fork(watchLoadUserPosts),
+    fork(watchLoadHashtagPosts),
     fork(watchRetweet),
     fork(watchUploadImages),
     fork(watchLikePost),
