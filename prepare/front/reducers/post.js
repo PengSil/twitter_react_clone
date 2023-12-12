@@ -1,6 +1,7 @@
 import shortId from "shortid";
 import { produce } from "immer";
 import { faker } from "@faker-js/faker";
+
 faker.seed(123);
 
 export const initialState = {
