@@ -1,12 +1,14 @@
-import React, { useState } from "react"; // eslint-disable-line no-unused-vars
+import React, { useState, useCallback } from "react"; // eslint-disable-line no-unused-vars
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import Link from "next/link";
 import { Menu, Input, Row, Col } from "antd";
 import styled, { createGlobalStyle } from "styled-components";
+import Router from "next/router";
 
 import UserProfile from "../components/UserProfile";
 import LoginForm from "../components/LoginForm";
+import useInput from "../hooks/useinput";
 
 const SearchInput = styled(Input.Search)`
   vertical-align: middle;
@@ -34,6 +36,7 @@ const Global = createGlobalStyle`
 }
 const AppLayout = ({ children }) => {
   // isLoggedIn이 바뀌면 알아서 AppLayout이 리랜더링 된다
+  const [searchInput, onChangeSearchInput] = useInput("");
   const me = useSelector((state) => state.user.me);
 
   //console.log("리듀서", isLoggedIn);
@@ -41,6 +44,10 @@ const AppLayout = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     redux로 빼서 쓰기
   */
+  const onSearch = useCallback(() => {
+    // 프로그래밍적으로 주소를 옮길때는 Router를 쓴다 링크로 가기 위해서는 Router
+    Router.push(`/hashtag/${searchInput}`);
+  }, [searchInput]);
 
   return (
     <div>
@@ -57,7 +64,7 @@ const AppLayout = ({ children }) => {
           </Link>
         </Menu.Item>
         <Menu.Item>
-          <SearchInput enterButton />
+          <SearchInput enterButton value={searchInput} onChange={onChangeSearchInput} onSearch={onSearch} />
         </Menu.Item>
         <Menu.Item>
           <Link href="/signup" legacyBehavior>

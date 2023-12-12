@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, Avatar, Button } from "antd";
 import { logoutRequestAction } from "../reducers/user";
+import Link from "next/link";
 
 const UserProfile = () => {
   const { me, logOutLoading } = useSelector((state) => state.user);
@@ -16,23 +17,38 @@ const UserProfile = () => {
       actions={[
         // react 에서 jsx 쓸때는 배열에 key값이 있어야 한다
         <div key="twit">
-          짹짹
+          <Link href={`/user/${me.id}`} legacyBehavior>
+            <a>짹짹</a>
+          </Link>
           <br />
           {me.Posts.length}
         </div>,
         <div key="followings">
-          팔로잉
+          <Link href={"/profile"} legacyBehavior>
+            <a>팔로잉</a>
+          </Link>
           <br />
           {me.Followings.length}
         </div>,
         <div key="followings">
-          팔로워
+          <Link href={"/profile"} legacyBehavior>
+            <a>팔로워</a>
+          </Link>
           <br />
           {me.Followers.length}
         </div>,
       ]}
     >
-      <Card.Meta avatar={<Avatar>{me.nickname[0]}</Avatar>} title={me.nickname} />
+      <Card.Meta
+        avatar={
+          <Link href={`/user/${me.id}`} legacyBehavior>
+            <a>
+              <Avatar>{me.nickname[0]}</Avatar>
+            </a>
+          </Link>
+        }
+        title={me.nickname}
+      />
       <Button onClick={onLogOut} loading={logOutLoading} style={{ marginTop: "7px" }}>
         로그아웃
       </Button>
