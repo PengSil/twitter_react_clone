@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { Form, Input, Button } from "antd";
 import { useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
+// eslint-disable-next-line
 import { addPost, UPLOAD_IMAGES_REQUEST, REMOVE_IMAGE, ADD_POST_REQUEST } from "../reducers/post";
 import useInput from "../hooks/useinput";
 

@@ -8,6 +8,7 @@ import { UNFOLLOW_REQUEST, REMOVE_FOLLOWER_REQUEST } from "../reducers/user";
 
 const FollowList = ({ header, data, onClickMore, loading }) => {
   const dispatch = useDispatch();
+
   console.log("data값 ", data);
   const onCancel = (id) => () => {
     if (header === "팔로잉") {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Head from "next/head";
+// eslint-disable-next-line
 import { useSelector, useDispatch } from "react-redux";
 import Router from "next/router";
 import axios from "axios";
@@ -11,6 +12,7 @@ import AppLayout from "../components/AppLayout";
 import NicknameEditForm from "../components/NicknameEditForm";
 import FollowList from "../components/FollowList";
 import wrapper from "../store/configureStore";
+// eslint-disable-next-line
 import { LOAD_FOLLOWERS_REQUEST, LOAD_FOLLOWINGS_REQUEST, LOAD_MY_INFO_REQUEST } from "../reducers/user";
 
 // fetcher 주소에서 어떻게 가져올지 설정
@@ -20,7 +22,7 @@ const Profile = () => {
   const followingList = [{ nickname: "문성" }, { nickname: "여기" }, { nickname: "저기" }];
   const followerList = [{ nickname: "문성" }, { nickname: "여기" }, { nickname: "저기" }];
   */
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
   const [followersLimit, setFollowersLimit] = useState(3);
   const [followingsLimit, setFollowingsLimit] = useState(3);

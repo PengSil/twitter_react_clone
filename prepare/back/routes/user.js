@@ -230,8 +230,8 @@ router.patch("/nickname", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// PATCH /user/1/follow
 router.patch("/:userId/follow", isLoggedIn, async (req, res, next) => {
-  // PATCH /user/1/follow
   try {
     const user = await User.findOne({ where: { id: req.params.userId } });
     if (!user) {

@@ -66,11 +66,11 @@ const AppLayout = ({ children }) => {
         <Menu.Item>
           <SearchInput enterButton value={searchInput} onChange={onChangeSearchInput} onSearch={onSearch} />
         </Menu.Item>
-        <Menu.Item>
+        {/* <Menu.Item>
           <Link href="/signup" legacyBehavior>
             <a>회원가입</a>
           </Link>
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu>
       {/* gutter 컬럼사이의 간격 
       Row Col 100%를 24등분해서 반응형으로 웹을 동작하게 함*/}
