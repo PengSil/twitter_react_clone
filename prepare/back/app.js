@@ -15,6 +15,7 @@ const db = require("./models");
 const passportConfig = require("./passport");
 
 const app = express();
+// dotenv로 config파일을 건들일수있다
 dotenv.config();
 
 db.sequelize
