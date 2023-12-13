@@ -10,18 +10,21 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 module.exports = withBundleAnalyzer({
   compress: true,
-  // eslint-disable-next-line
-  wepack(config, { webpack }) {
+  webpack(config, { webpack }) {
     const prod = process.env.NODE_ENV === "production";
     const plugins = [...config.plugins, new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /^\.\/ko$/)];
     return {
       ...config,
       mode: prod ? "production" : "development",
-      devtool: prod ? "hidden-source-map" : "eval",
+      devtool: prod ? "hidden-source-map" : "eval-source-map",
       plugins,
     };
   },
   swcMinify: true,
+  // .babelrc에 swc 강제 적용
+  experimental: {
+    forceSwcTransforms: true,
+  },
   compiler: {
     // ssr, displayName true가 기본값으로 켜진다.
     styledComponents: true,

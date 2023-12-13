@@ -1,7 +1,7 @@
 import React from "react";
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
-
+// css serverside
 // app.js위에 있는 document.js app.js를 감싼다
 export default class MyDocument extends Document {
   // getInitalProps  document나 app에서 쓰는 특수한 서버사이드 랜더링 매서드
@@ -35,7 +35,6 @@ export default class MyDocument extends Document {
       <Html>
         <Head />
         <body>
-          <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2Ces2016%2Ces2017%2Ces2018%2Ces2019%2Ces2020%2Ces2021%2Ces2022%2Cdefault" />
           <Main />
           <NextScript />
         </body>
